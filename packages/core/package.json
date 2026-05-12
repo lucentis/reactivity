@@ -1,0 +1,19 @@
+{
+    "name": "@lucentis/reactivity-core",
+    "version": "0.0.0",
+    "type": "module",
+    "private": false,
+    "scripts": {
+        "build": "tsc && vite build",
+        "typecheck": "tsc"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist"
+    ]
+}

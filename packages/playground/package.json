@@ -1,0 +1,16 @@
+{
+    "name": "@lucentis/reactivity-playground",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build"
+    },
+    "dependencies": {
+      "@lucentis/reactivity-core": "*"
+    },
+    "devDependencies": {
+      "@vitejs/plugin-vue": "^6.0.6"
+    }
+  }
