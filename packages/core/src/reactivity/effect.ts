@@ -1,4 +1,4 @@
-import { setActiveEffect } from "./runtime";
+import { setActiveEffect } from "../runtime-reactivity/runtime";
 
 export type ReactiveEffect = {
     fn: () => void;

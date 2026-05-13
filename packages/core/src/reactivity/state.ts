@@ -1,4 +1,4 @@
-import { getActiveEffect } from "./runtime";
+import { getActiveEffect } from "../runtime-reactivity/runtime";
 import { type ReactiveEffect, runEffect } from "./effect";
 
 export function state<T>(initial: T) {
@@ -7,7 +7,7 @@ export function state<T>(initial: T) {
     const subscribers = new Set<ReactiveEffect>();
 
     function get() {
-        track(subscribers, new Set());
+        track(subscribers);
         return value;
     }
 
