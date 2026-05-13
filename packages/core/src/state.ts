@@ -1,5 +1,5 @@
 import { getActiveEffect } from "./runtime";
-import type { ReactiveEffect } from "./effect";
+import { type ReactiveEffect, runEffect } from "./effect";
 
 export function state<T>(initial: T) {
     let value = initial;
@@ -7,13 +7,7 @@ export function state<T>(initial: T) {
     const subscribers = new Set<ReactiveEffect>();
 
     function get() {
-        const effect = getActiveEffect();
-
-        if (effect) {
-            subscribers.add(effect);
-            effect.deps.add(subscribers);
-        }
-
+        track(subscribers, new Set());
         return value;
     }
 
@@ -22,10 +16,24 @@ export function state<T>(initial: T) {
 
         value = newValue;
 
-        for (const effect of subscribers) {
-            effect.fn();
-        }
+        trigger(subscribers);
     }
 
     return { get, set };
+}
+
+export function track(subscribers: Set<ReactiveEffect>) {
+    const effect = getActiveEffect();
+  
+    if (!effect) return;
+  
+    subscribers.add(effect);
+  
+    effect.deps.add(subscribers);
+}
+
+export function trigger(subscribers: Set<ReactiveEffect>) {
+    for (const effect of [...subscribers]) {
+        runEffect(effect);
+    }
 }

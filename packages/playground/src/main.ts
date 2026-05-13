@@ -6,5 +6,9 @@ effect(() => {
     console.log("count =", count.get());
 });
 
+effect(() => {
+    console.log("count bis =", count.get());
+});
+
 count.set(1);
 count.set(2);
