@@ -6,13 +6,17 @@ let isPending = false;
 function flush(): void {
     // Copy before iterating — a running effect may trigger new state changes
     // which would call schedule() again and add to the queue
-    const effects = [...queue];
-    queue.clear();
-    isPending = false;
+    while (queue.size > 0) {
+        const effects = [...queue];
 
-    for (const effect of effects) {
-        runEffect(effect);
+        queue.clear();
+
+        for (const effect of effects) {
+            runEffect(effect);
+        }
     }
+
+    isPending = false;
 }
 
 export function schedule(effect: ReactiveEffect): void {
