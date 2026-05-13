@@ -22,7 +22,7 @@ export function state<T>(initial: T) {
     return { get, set };
 }
 
-export function track(subscribers: Set<ReactiveEffect>) {
+function track(subscribers: Set<ReactiveEffect>) {
     const effect = getActiveEffect();
   
     if (!effect) return;
@@ -32,7 +32,7 @@ export function track(subscribers: Set<ReactiveEffect>) {
     effect.deps.add(subscribers);
 }
 
-export function trigger(subscribers: Set<ReactiveEffect>) {
+function trigger(subscribers: Set<ReactiveEffect>) {
     for (const effect of [...subscribers]) {
         runEffect(effect);
     }

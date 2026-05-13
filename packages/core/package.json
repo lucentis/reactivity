@@ -5,7 +5,9 @@
     "private": false,
     "scripts": {
         "build": "tsc && vite build",
-        "typecheck": "tsc"
+        "typecheck": "tsc",
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "exports": {
         ".": {
