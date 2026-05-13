@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { state } from '../state'
 import { effect } from '../effect'
+import { flushSync } from '../../runtime-reactivity/scheduler'
 
 describe('state', () => {
     describe('get', () => {
@@ -19,9 +20,10 @@ describe('state', () => {
     })
 
     describe('set', () => {
-        it('updates the value', () => {
+        it('updates the value synchronously', () => {
             const count = state(0)
             count.set(5)
+            // get() reads the value directly — no scheduler involved
             expect(count.get()).toBe(5)
         })
 
@@ -29,13 +31,11 @@ describe('state', () => {
             const count = state(0)
             const spy = vi.fn()
 
-            effect(() => {
-                count.get()
-                spy()
-            })
+            effect(() => { count.get(); spy() })
 
             spy.mockClear()
-            count.set(0) // same value
+            count.set(0)
+            flushSync()
 
             expect(spy).not.toHaveBeenCalled()
         })
@@ -44,13 +44,11 @@ describe('state', () => {
             const count = state(0)
             const spy = vi.fn()
 
-            effect(() => {
-                count.get()
-                spy()
-            })
+            effect(() => { count.get(); spy() })
 
             spy.mockClear()
             count.set(1)
+            flushSync()
 
             expect(spy).toHaveBeenCalledTimes(1)
         })
@@ -66,6 +64,7 @@ describe('state', () => {
             spy1.mockClear()
             spy2.mockClear()
             count.set(1)
+            flushSync()
 
             expect(spy1).toHaveBeenCalledTimes(1)
             expect(spy2).toHaveBeenCalledTimes(1)

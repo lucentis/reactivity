@@ -6,14 +6,11 @@ effect(() => {
     console.log("count =", count.get());
 });
 
-count.set(1);
-count.set(2);
+const double = derived(() => count.get() * 2);
 
-// const double = derived(() => count.get() * 2);
+effect(() => {
+    console.log("double =", double.get());
+});
 
-// effect(() => {
-//     console.log("double =", double.get());
-// });
-
-// count.set(3);
-// count.set(5);
+count.set(3);
+count.set(5);

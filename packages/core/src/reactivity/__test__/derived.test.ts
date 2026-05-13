@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { state } from '../state'
 import { effect } from '../effect'
 import { derived } from '../derived'
+import { flushSync } from '../../runtime-reactivity/scheduler'
 
 describe('derived', () => {
     it('computes the initial value', () => {
@@ -16,6 +17,8 @@ describe('derived', () => {
         const double = derived(() => count.get() * 2)
 
         count.set(5)
+        flushSync()
+
         expect(double.get()).toBe(10)
     })
 
@@ -24,12 +27,10 @@ describe('derived', () => {
         const double = derived(() => count.get() * 2)
         const values: number[] = []
 
-        effect(() => {
-            values.push(double.get())
-        })
+        effect(() => { values.push(double.get()) })
 
-        count.set(1)
-        count.set(3)
+        count.set(1); flushSync()
+        count.set(3); flushSync()
 
         expect(values).toEqual([0, 2, 6])
     })
@@ -41,10 +42,10 @@ describe('derived', () => {
 
         expect(sum.get()).toBe(3)
 
-        a.set(10)
+        a.set(10); flushSync()
         expect(sum.get()).toBe(12)
 
-        b.set(5)
+        b.set(5); flushSync()
         expect(sum.get()).toBe(15)
     })
 
@@ -55,7 +56,7 @@ describe('derived', () => {
 
         expect(quadruple.get()).toBe(8)
 
-        count.set(3)
+        count.set(3); flushSync()
         expect(quadruple.get()).toBe(12)
     })
 })

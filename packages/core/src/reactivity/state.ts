@@ -1,5 +1,6 @@
 import { getActiveEffect } from "../runtime-reactivity/runtime";
-import { type ReactiveEffect, runEffect } from "./effect";
+import { type ReactiveEffect } from "./effect";
+import { schedule } from "../runtime-reactivity/scheduler";
 
 export function state<T>(initial: T) {
     let value = initial;
@@ -24,16 +25,15 @@ export function state<T>(initial: T) {
 
 function track(subscribers: Set<ReactiveEffect>) {
     const effect = getActiveEffect();
-  
+
     if (!effect) return;
-  
+
     subscribers.add(effect);
-  
     effect.deps.add(subscribers);
 }
 
 function trigger(subscribers: Set<ReactiveEffect>) {
     for (const effect of [...subscribers]) {
-        runEffect(effect);
+        schedule(effect);
     }
 }
