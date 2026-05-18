@@ -6,6 +6,7 @@ export function track(subscribers: Set<ReactiveEffect>): void {
     const effect = getActiveEffect();
 
     if (effect === null) return;
+    if (effect.stopped) return;
 
     subscribers.add(effect);
     effect.deps.add(subscribers);
@@ -13,11 +14,12 @@ export function track(subscribers: Set<ReactiveEffect>): void {
 
 export function trigger(subscribers: Set<ReactiveEffect>): void {
     for (const effect of [...subscribers]) {
+        if (effect.stopped) continue;
+
         if (effect.options?.scheduler) {
-            effect.options.scheduler(); 
-        } else { 
-            schedule(effect); 
+            effect.options.scheduler();
+        } else {
+            schedule(effect);
         }
-       
     }
 }

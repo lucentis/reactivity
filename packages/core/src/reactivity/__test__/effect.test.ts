@@ -60,12 +60,10 @@ describe('effect', () => {
         count.set(2)
         count.set(3)
 
-        // queue is not flushed yet — effect has not run
         expect(spy).not.toHaveBeenCalled()
 
         flushSync()
 
-        // effect ran exactly once, with the final value
         expect(spy).toHaveBeenCalledTimes(1)
         expect(count.get()).toBe(3)
     })
@@ -83,7 +81,7 @@ describe('effect', () => {
 
         spy.mockClear()
 
-        toggle.set(false); flushSync() // effect now depends on b, not a
+        toggle.set(false); flushSync()
         spy.mockClear()
 
         a.set(99); flushSync()
@@ -91,5 +89,48 @@ describe('effect', () => {
 
         b.set(1); flushSync()
         expect(spy).toHaveBeenCalledTimes(1)
+    })
+
+    describe('stopEffect', () => {
+        it('stops the effect from re-running after stop is called', () => {
+            const count = state(0)
+            const spy = vi.fn()
+
+            const stop = effect(() => { count.get(); spy() })
+
+            spy.mockClear()
+            stop()
+
+            count.set(1)
+            flushSync()
+
+            expect(spy).not.toHaveBeenCalled()
+        })
+
+        it('removes the effect from all subscriber sets', () => {
+            const a = state(0)
+            const b = state(0)
+            const spy = vi.fn()
+
+            const stop = effect(() => { a.get(); b.get(); spy() })
+
+            stop()
+            spy.mockClear()
+
+            a.set(1); flushSync()
+            b.set(1); flushSync()
+
+            expect(spy).not.toHaveBeenCalled()
+        })
+
+        it('calling stop multiple times does not throw', () => {
+            const stop = effect(vi.fn())
+
+            expect(() => {
+                stop()
+                stop()
+                stop()
+            }).not.toThrow()
+        })
     })
 })
