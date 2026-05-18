@@ -1,12 +1,34 @@
-import { state } from "./state";
-import { effect } from "./effect";
+import { effect, runEffect } from "./effect";
+import { source } from "../runtime-reactivity/source";
 
 export function derived<T>(fn: () => T) {
-    const s = state<T>(undefined as T);
+    const src = source();
 
-    effect(() => {
-        s.set(fn());
+    let value: T;
+    let dirty = true;
+
+    const eff = effect(fn, {
+        lazy: true,
+
+        scheduler: () => {
+            dirty = true;
+
+            src.trigger();
+        }
     });
 
-    return { get: s.get };
+    function get(): T {
+        src.track();
+
+        if (dirty) {
+            value = runEffect(eff);
+            dirty = false;
+        }
+
+        return value;
+    }
+
+    return {
+        get
+    };
 }

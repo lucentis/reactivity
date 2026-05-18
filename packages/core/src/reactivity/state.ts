@@ -1,14 +1,15 @@
 import { getActiveEffect } from "../runtime-reactivity/runtime";
 import { type ReactiveEffect } from "./effect";
 import { schedule } from "../runtime-reactivity/scheduler";
+import { source } from '../runtime-reactivity/source'
 
 export function state<T>(initial: T) {
     let value = initial;
 
-    const subscribers = new Set<ReactiveEffect>();
+    const src = source()
 
     function get() {
-        track(subscribers);
+        src.track()
         return value;
     }
 
@@ -17,23 +18,8 @@ export function state<T>(initial: T) {
 
         value = newValue;
 
-        trigger(subscribers);
+        src.trigger()
     }
 
     return { get, set };
-}
-
-function track(subscribers: Set<ReactiveEffect>) {
-    const effect = getActiveEffect();
-
-    if (!effect) return;
-
-    subscribers.add(effect);
-    effect.deps.add(subscribers);
-}
-
-function trigger(subscribers: Set<ReactiveEffect>) {
-    for (const effect of [...subscribers]) {
-        schedule(effect);
-    }
 }
