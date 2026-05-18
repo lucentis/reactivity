@@ -10,24 +10,22 @@ export type ReactiveEffect = {
 };
 
 export function effect(
-    fn: () => void, 
-    options?: { lazy?: boolean, scheduler }
+    fn: () => void,
+    options
 ) {
     const eff: ReactiveEffect = {
         fn,
         deps: new Set(),
         options: options
     };
-
-    if (!options?.lazy) {
-        runEffect(eff);
-    }
+    runEffect(eff);
 
     return eff
 }
 
 export function runEffect(eff) {
     cleanup(eff);
+    console.log(eff)
 
     const prev = getActiveEffect()
     setActiveEffect(eff);
@@ -42,4 +40,15 @@ export function cleanup(eff: ReactiveEffect) {
         dep.delete(eff);
     }
     eff.deps.clear();
+}
+
+export function createReactiveEffect(
+    fn: () => any,
+    options: ReactiveEffect.options
+): ReactiveEffect {
+    return {
+        fn,
+        deps: new Set(),
+        options
+    };
 }

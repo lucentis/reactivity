@@ -1,4 +1,4 @@
-import { effect, runEffect } from "./effect";
+import { effect, runEffect, createReactiveEffect } from "./effect";
 import { source } from "../runtime-reactivity/source";
 
 export function derived<T>(fn: () => T) {
@@ -7,15 +7,16 @@ export function derived<T>(fn: () => T) {
     let value: T;
     let dirty = true;
 
-    const eff = effect(fn, {
-        lazy: true,
+    const eff: ReactiveEffect = createReactiveEffect(
+        fn,
+        {
+            scheduler: () => {
+                dirty = true;
 
-        scheduler: () => {
-            dirty = true;
-
-            src.trigger();
+                src.trigger();
+            }
         }
-    });
+    );
 
     function get(): T {
         src.track();
